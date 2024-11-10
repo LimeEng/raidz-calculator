@@ -1,0 +1,44 @@
+[
+    {
+        "size": 2,
+        "cost": 1194,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-2TB-Haarddisk-ST2000VN003-SATA-600-35/3130543"
+    },
+    {
+        "size": 3,
+        "cost": 1588,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-3TB-Haarddisk-ST3000VN006-SATA-600-35/3040427"
+    },
+    {
+        "size": 4,
+        "cost": 1371,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-4TB-Haarddisk-ST4000VN006-SATA-600-35/3040426"
+    },
+    {
+        "size": 6,
+        "cost": 2123,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-6TB-Haarddisk-ST6000VN006-SATA-600-35/3131267"
+    },
+    {
+        "size": 8,
+        "cost": 2400,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-8TB-Haarddisk-ST8000VN004-SATA-600-35/2778345"
+    },
+    {
+        "size": 12,
+        "cost": 3020,
+        "name": "Seagate IronWolf",
+        "link": "https://www.proshop.se/Haarddisk/Seagate-IronWolf-12TB-Haarddisk-ST12000VN0008-SATA-600-35/2684542"
+    },
+    {
+        "size": 12,
+        "cost": 1192,
+        "name": "HGST WD Ultrastar (renewed)",
+        "link": "https://www.amazon.com/HGST-Ultrastar-HUH721212ALE600-3-5-Inch-Internal/dp/B07Y8GF5M6"
+    }
+]

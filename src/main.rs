@@ -1,5 +1,10 @@
+use colored::Colorize;
 use raidz::{Disk, Vdev, VdevType};
 use std::{env, io};
+use tabled::{
+    builder::Builder,
+    settings::{style::BorderSpanCorrection, Style},
+};
 
 fn find_configurations(
     target_storage: f64,
@@ -26,28 +31,27 @@ fn find_configurations(
     config
 }
 
-fn print_configurations(target_storage: f64, configs: &mut [Vdev]) {
+fn print_configurations(header: &str, target_storage: f64, configs: &mut [Vdev]) {
     configs.sort_by(|a, b| a.total_cost().partial_cmp(&b.total_cost()).unwrap());
-    println!(
-        "{:<20} {:<10} {:<20} {:<20} {:<20} {:<20} {:<20}",
+
+    let mut builder = Builder::default();
+
+    let col_header: Vec<_> = [
+        "Name",
         "Disk Size (TB)",
         "# Disks",
         "Usable Storage (TB)",
         "Raw Storage (TB)",
         "Total Cost",
         "Cost per usable TB",
-        "Cost per raw TB"
-    );
-    println!(
-        "{:<20} {:<10} {:<20} {:<20} {:<20} {:<20} {:<20}",
-        "---------------",
-        "-------",
-        "-----------------",
-        "-----------------",
-        "-----------",
-        "----------------",
-        "--------------"
-    );
+        "Cost per raw TB",
+    ]
+    .iter()
+    .map(|t| t.bold().to_string())
+    .collect();
+
+    builder.push_record(col_header);
+
     for config in configs {
         let deviation = config.usable_storage() - target_storage;
 
@@ -55,54 +59,40 @@ fn print_configurations(target_storage: f64, configs: &mut [Vdev]) {
             format!("{:.2}", config.usable_storage())
         } else {
             let percentage_deviation = (deviation.abs() / target_storage) * 100.0;
-            let sign = if deviation > 0.0 { "+" } else { "-" };
-            format!(
-                "{:.2} ({sign}{:.2}%)",
-                config.usable_storage(),
-                percentage_deviation
-            )
+            let percentage_deviation = if deviation > 0.0 {
+                format!("+{percentage_deviation:.2}%").green()
+            } else {
+                format!("-{percentage_deviation:.2}%").red()
+            };
+
+            format!("{:.2} ({percentage_deviation})", config.usable_storage())
         };
 
-        println!(
-            "{:<20} {:<10} {:<20} {:<20} {:<20} {:<20} {:<20}",
+        let row = [
+            config.disk_type.name.clone(),
             format!("{:.2}", config.disk_type.size),
-            config.num_disks,
+            config.num_disks.to_string(),
             usable_storage,
             format!("{:.2}", config.raw_storage()),
             format!("{:.2}", config.total_cost()),
             format!("{:.2}", config.total_cost() / config.usable_storage()),
-            format!("{:.2}", config.total_cost() / config.raw_storage())
-        );
+            format!("{:.2}", config.total_cost() / config.raw_storage()),
+        ];
+        builder.push_record(row);
     }
+    let table = builder
+        .build()
+        .with(Style::sharp())
+        .with(BorderSpanCorrection)
+        .to_string();
+
+    println!("{header}");
+    println!("{table}");
 }
 
 fn main() {
-    let disks = [
-        Disk {
-            size: 2.0,
-            cost: 1128.0,
-        },
-        Disk {
-            size: 3.0,
-            cost: 1502.0,
-        },
-        Disk {
-            size: 4.0,
-            cost: 1318.0,
-        },
-        Disk {
-            size: 6.0,
-            cost: 2050.0,
-        },
-        Disk {
-            size: 8.0,
-            cost: 2328.0,
-        },
-        Disk {
-            size: 12.0,
-            cost: 3110.0,
-        },
-    ];
+    let json = include_str!("../disks.json");
+    let disks: Vec<Disk> = serde_json::from_str(json).unwrap();
 
     let range_percentage = 30.0;
     let max_disks = 24;
@@ -163,8 +153,8 @@ fn main() {
         );
         println!();
         for (strategy, mut config) in configs {
-            println!("Strategy {}", strategy.name());
-            print_configurations(target_storage, &mut config);
+            let header = format!("Strategy {}", strategy.name());
+            print_configurations(&header, target_storage, &mut config);
             println!();
         }
     }
